@@ -1,4 +1,4 @@
-import { App, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface MyPluginSettings {
 	git_url: string;
@@ -6,6 +6,18 @@ interface MyPluginSettings {
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	git_url: 'default'
+}
+
+
+
+const pullChanges = (url: string) => {
+	console.log(`pulling from remote branch ${url}`);
+	new Notice('Pulling changes');
+}
+
+const pushChanges = (url: string) => {
+	console.log(`pushing to remote branch ${url}`);
+	new Notice('Pushing changes');
 }
 
 export default class MyPlugin extends Plugin {
@@ -16,8 +28,11 @@ export default class MyPlugin extends Plugin {
 
 		await this.loadSettings();
 
-		this.addRibbonIcon('up-and-down-arrows', 'Rebase changes', () => {
-			new Notice(this.settings.git_url);
+		// Pull git changes	
+		pullChanges(this.settings.git_url);
+
+		this.addRibbonIcon('up-arrow-with-tail', 'Push changes', () => {
+			pushChanges(this.settings.git_url);
 		});
 
 		this.addStatusBarItem().setText('Status Bar Text');
