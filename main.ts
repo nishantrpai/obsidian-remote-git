@@ -1,4 +1,4 @@
-import { App, Vault, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Vault, Notice, Plugin, PluginSettingTab, Setting, DataAdapter } from 'obsidian';
 import simpleGit, { SimpleGit } from 'simple-git';
 const git: SimpleGit = simpleGit();
 
@@ -18,15 +18,15 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 const pullChanges = async (url: string, branch: string) => {
 	console.log(`pulling from remote branch ${url}, ${branch}`);
 	console.log(process.cwd());
-	console.log(new Vault());
-	// await git.pull('origin', branch);
-	new Notice('Pulling changes');
+	await git.pull('origin', branch);
+	new Notice('Changes pulled');
 }
 
 const pushChanges = async (url: string, branch: string) => {
 	console.log(`pushing to remote branch ${url}, ${branch}`);
-	// await git.add('./*').commit("commit from plugin").push('origin', branch);
-	new Notice('Pushing changes');
+	await git.add('.').commit("commit from plugin");
+	await git.push('origin', branch);
+	new Notice('Changes pushed');
 }
 
 export default class MyPlugin extends Plugin {
@@ -36,10 +36,18 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		console.log('loading plugin');
 
+		let current_dir = this.app.vault.adapter['basePath'];
+		process.chdir(current_dir);
+		console.log(current_dir);
 		await this.loadSettings();
 
 		// Pull git changes	
 		pullChanges(this.settings.git_url, this.settings.branch);
+
+		this.addRibbonIcon('down-arrow-with-tail', 'Pull changes', () => {
+			pullChanges(this.settings.git_url, this.settings.branch);
+		});
+
 
 		this.addRibbonIcon('up-arrow-with-tail', 'Push changes', () => {
 			pushChanges(this.settings.git_url, this.settings.branch);
