@@ -2,10 +2,12 @@ import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 interface MyPluginSettings {
 	git_url: string;
+	branch: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	git_url: 'default'
+	git_url: 'default',
+	branch: 'main'
 }
 
 
@@ -81,7 +83,19 @@ class SampleSettingTab extends PluginSettingTab {
 					console.log(value);
 					this.plugin.settings.git_url = value;
 					await this.plugin.saveSettings();
-					new Notice('Updated Git URL');
 				}));
+
+		new Setting(containerEl)
+			.setName('Branch Name')
+			.setDesc('')
+			.addText(text => text
+				.setPlaceholder('main')
+				.setValue(this.plugin.settings.branch)
+				.onChange(async (value) => {
+					console.log(value);
+					this.plugin.settings.branch = value;
+					await this.plugin.saveSettings();
+				}));
+
 	}
 }
