@@ -1,4 +1,7 @@
-import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Vault, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import simpleGit, { SimpleGit } from 'simple-git';
+const git: SimpleGit = simpleGit();
+
 
 interface MyPluginSettings {
 	git_url: string;
@@ -12,18 +15,23 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 
 
-const pullChanges = (url: string) => {
-	console.log(`pulling from remote branch ${url}`);
+const pullChanges = async (url: string, branch: string) => {
+	console.log(`pulling from remote branch ${url}, ${branch}`);
+	console.log(process.cwd());
+	console.log(new Vault());
+	// await git.pull('origin', branch);
 	new Notice('Pulling changes');
 }
 
-const pushChanges = (url: string) => {
-	console.log(`pushing to remote branch ${url}`);
+const pushChanges = async (url: string, branch: string) => {
+	console.log(`pushing to remote branch ${url}, ${branch}`);
+	// await git.add('./*').commit("commit from plugin").push('origin', branch);
 	new Notice('Pushing changes');
 }
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+
 
 	async onload() {
 		console.log('loading plugin');
@@ -31,17 +39,15 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// Pull git changes	
-		pullChanges(this.settings.git_url);
+		pullChanges(this.settings.git_url, this.settings.branch);
 
 		this.addRibbonIcon('up-arrow-with-tail', 'Push changes', () => {
-			pushChanges(this.settings.git_url);
+			pushChanges(this.settings.git_url, this.settings.branch);
 		});
 
 		this.addStatusBarItem().setText('Status Bar Text');
 
 		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
