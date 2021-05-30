@@ -13,8 +13,6 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	branch: 'main'
 }
 
-
-
 const pullChanges = async (url: string, branch: string) => {
 	console.log(`pulling from remote branch ${url}, ${branch}`);
 	console.log(process.cwd());
@@ -24,8 +22,9 @@ const pullChanges = async (url: string, branch: string) => {
 
 const pushChanges = async (url: string, branch: string) => {
 	console.log(`pushing to remote branch ${url}, ${branch}`);
+	console.log(process.cwd());
 	await git.add('.').commit("commit from plugin");
-	// await git.push('origin', branch);
+	await git.push('origin', branch);
 	new Notice('Changes pushed');
 }
 
@@ -36,17 +35,23 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		console.log('loading plugin');
 
-		let current_dir = this.app.vault.adapter['basePath'];
-		process.chdir(current_dir);
-		console.log(current_dir);
 		await this.loadSettings();
 
+		const moveToVault = () => {
+			let current_dir = this.app.vault.adapter['basePath'];
+			process.chdir(current_dir);
+			console.log(current_dir);
+		}
+		
+
 		this.addRibbonIcon('down-arrow-with-tail', 'Pull changes', () => {
+			moveToVault();
 			pullChanges(this.settings.git_url, this.settings.branch);
 		});
 
 
 		this.addRibbonIcon('up-arrow-with-tail', 'Push changes', () => {
+			moveToVault();
 			pushChanges(this.settings.git_url, this.settings.branch);
 		});
 
