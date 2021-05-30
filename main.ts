@@ -25,7 +25,7 @@ const pullChanges = async (url: string, branch: string) => {
 const pushChanges = async (url: string, branch: string) => {
 	console.log(`pushing to remote branch ${url}, ${branch}`);
 	await git.add('.').commit("commit from plugin");
-	await git.push('origin', branch);
+	// await git.push('origin', branch);
 	new Notice('Changes pushed');
 }
 
