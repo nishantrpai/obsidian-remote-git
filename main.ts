@@ -41,9 +41,6 @@ export default class MyPlugin extends Plugin {
 		console.log(current_dir);
 		await this.loadSettings();
 
-		// Pull git changes	
-		pullChanges(this.settings.git_url, this.settings.branch);
-
 		this.addRibbonIcon('down-arrow-with-tail', 'Pull changes', () => {
 			pullChanges(this.settings.git_url, this.settings.branch);
 		});
