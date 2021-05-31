@@ -24,8 +24,14 @@ const pushChanges = async (url: string, branch: string) => {
 	console.log(`pushing to remote branch ${url}, ${branch}`);
 	console.log(process.cwd());
 	await git.add('.').commit("commit from plugin");
-	await git.push('origin', branch);
-	new Notice('Changes pushed');
+	try { //for merge conflict error
+		await git.push('origin', branch);
+		new Notice('Changes pushed');
+	} catch (e) {
+		pullChanges(url, branch);
+		console.log(e);
+		new Notice(`Merge conflicts`)
+	}
 }
 
 export default class MyPlugin extends Plugin {
@@ -42,7 +48,7 @@ export default class MyPlugin extends Plugin {
 			process.chdir(current_dir);
 			console.log(current_dir);
 		}
-		
+
 
 		this.addRibbonIcon('down-arrow-with-tail', 'Pull changes', () => {
 			moveToVault();
